@@ -33,7 +33,7 @@ public class Main {
                     throw new ArithmeticException("Division by zero");
                 }
                 yield operand1 / operand2; // yield is used inside switch expressions
-            } // No division by zero check (for simplicity)
+            }
             default -> throw new IllegalArgumentException("Invalid operator");
         };
     }
