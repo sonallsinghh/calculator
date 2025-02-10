@@ -1,6 +1,68 @@
 package org.example;
 
+import java.util.Scanner;
+import java.util.Stack;
+
 public class Main {
+    public static int evaluate(String expression) {
+        char[] tokens = expression.toCharArray();
+        Stack<Integer> values = new Stack<>();
+        Stack<Character> ops = new Stack<>();
+
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i] == ' ')
+                continue;
+
+            if (tokens[i] >= '0' && tokens[i] <= '9') {
+                StringBuffer sbuf = new StringBuffer();
+                while (i < tokens.length && tokens[i] >= '0' && tokens[i] <= '9')
+                    sbuf.append(tokens[i++]);
+                values.push(Integer.parseInt(sbuf.toString()));
+                i--;
+            } else if (tokens[i] == '(')
+                ops.push(tokens[i]);
+            else if (tokens[i] == ')') {
+                while (ops.peek() != '(')
+                    values.push(applyOp(ops.pop(), values.pop(), values.pop()));
+                ops.pop();
+            } else if (tokens[i] == '+' || tokens[i] == '-' || tokens[i] == '*' || tokens[i] == '/') {
+                while (!ops.empty() && hasPrecedence(tokens[i], ops.peek()))
+                    values.push(applyOp(ops.pop(), values.pop(), values.pop()));
+                ops.push(tokens[i]);
+            }
+        }
+
+        while (!ops.empty())
+            values.push(applyOp(ops.pop(), values.pop(), values.pop()));
+
+        return values.pop();
+    }
+
+    public static boolean hasPrecedence(char op1, char op2) {
+        if (op2 == '(' || op2 == ')')
+            return false;
+        if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'))
+            return false;
+        else
+            return true;
+    }
+
+    public static int applyOp(char op, int b, int a) {
+        switch (op) {
+            case '+':
+                return a + b;
+            case '-':
+                return a - b;
+            case '*':
+                return a * b;
+            case '/':
+                if (b == 0)
+                    throw new UnsupportedOperationException("Cannot divide by zero");
+                return a / b;
+        }
+        return 0;
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -13,39 +75,12 @@ public class Main {
             }
 
             try {
-                double result = evaluate(expression);
+                int result = evaluate(expression);
                 System.out.println(expression + " = " + result);
             } catch (Exception e) {
                 System.err.println("Error: " + e.getMessage());
             }
         }
-
-        scanner.close();
-    }
-
-    public static double evaluate(String expression) {
-        // Very basic evaluation (only handles a single operation)
-        String[] parts = expression.split(" "); // Split by spaces
-
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid expression"); // Must be like "2 + 3"
-        }
-
-        double operand1 = Double.parseDouble(parts[0]);
-        String operator = parts[1];
-        double operand2 = Double.parseDouble(parts[2]);
-
-        return switch (operator) {
-            case "+" -> operand1 + operand2;
-            case "-" -> operand1 - operand2;
-            case "*" -> operand1 * operand2;
-            case "/" -> {  
-                if (operand2 == 0) {
-                    throw new ArithmeticException("Division by zero");
-                }
-                yield operand1 / operand2; 
-            } 
-            default -> throw new IllegalArgumentException("Invalid operator");
-        };
+        scanner.close(); // Close the scanner to prevent resource leaks
     }
 }
