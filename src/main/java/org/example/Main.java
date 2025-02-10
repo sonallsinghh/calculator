@@ -2,14 +2,25 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-        String expression = "2 + 3"; // Example
+        Scanner scanner = new Scanner(System.in);
 
-        try {
-            double result = evaluate(expression);
-            System.out.println(expression + " = " + result);
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+        while (true) {
+            System.out.print("Enter an expression (or type 'exit'): ");
+            String expression = scanner.nextLine();
+
+            if (expression.equalsIgnoreCase("exit")) {
+                break;
+            }
+
+            try {
+                double result = evaluate(expression);
+                System.out.println(expression + " = " + result);
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+            }
         }
+
+        scanner.close();
     }
 
     public static double evaluate(String expression) {
