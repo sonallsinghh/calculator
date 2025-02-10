@@ -28,7 +28,12 @@ public class Main {
             case "+" -> operand1 + operand2;
             case "-" -> operand1 - operand2;
             case "*" -> operand1 * operand2;
-            case "/" -> operand1 / operand2; // No division by zero check (for simplicity)
+            case "/" -> {  // Use a block for more complex logic
+                if (operand2 == 0) {
+                    throw new ArithmeticException("Division by zero");
+                }
+                yield operand1 / operand2; // yield is used inside switch expressions
+            } // No division by zero check (for simplicity)
             default -> throw new IllegalArgumentException("Invalid operator");
         };
     }
